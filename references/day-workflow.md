@@ -37,7 +37,16 @@ The console prints every detected activity with local start time, kind and lengt
 `2026-10-09T10:31 ferry 0.9 km`. For each one add a label in `trip.json → timeline.labels` keyed by that
 start time. Fix kinds in `timeline.kinds` (Google reports steep e-bike climbs as `SKIING`, a ride in a friend's
 car as `IN_PASSENGER_VEHICLE` → set `car`). Segments shorter than 600 m are ignored; same-kind segments with a
-pause under 20 min are merged (the label of the first start wins).
+pause under 20 min are merged (the label of the first start wins). Timeline entries after the trip
+(default: end day 23:59, or `timeline.ignoreAfter`) are skipped.
+
+Houseboat / boat (`boat`, Google `SAILING`): the timeline often has only start and end on the water, so photos
+with EXIF GPS serve as extra waypoints for `boat` and `ferry` (needs `public/data/photos.json` from an earlier
+`npm run data`). Boat routes follow OSM rivers/canals (`scripts/waterway.mjs`, Overpass, cached in
+`data/waterways.json`); lakes without a fairway are bridged between river ends. In networks with many canals
+list the navigable ones in `timeline.waterways` (OSM names) – long side canals otherwise attract the route.
+After changing `waterways`, delete `data/waterways.json` and `data/timeline/*_boat.json`, then
+`npm run data:timeline`. If start/end are not near water, the boat falls back to raw points.
 
 Stops: visits of 10 min or more become stops. A stop within 400 m of an entry in `places` gets that name,
 otherwise "Pause"/"Stop". Add campsites, friends' houses, ferry piers, summits to `places` – with names you

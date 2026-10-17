@@ -9,7 +9,7 @@
   "lang": "de",                       // UI language: de | en (src/i18n.ts)
   "start": "2026-10-05", "end": "2026-10-18",
   "timezone": "Europe/Berlin",        // day boundaries, clock times
-  "vehicles": ["camper", "ebike", "walk"],   // hero stat tiles (max 3); kinds: camper car ebike bike walk hike ferry bus train
+  "vehicles": ["camper", "ebike", "walk"],   // hero stat tiles (max 3); kinds: camper car ebike bike walk hike ferry bus train boat
   "output": "single",                 // single | web | nas
   "accent": "#ff8a3d",                // optional accent colour
   "finished": false,                  // true hides "to be continued"
@@ -18,6 +18,11 @@
   },
   "timeline": {                       // only with a Google Timeline export
     "ignoreBefore": "2026-10-05T14:20",          // local time; everything earlier is skipped
+    "ignoreAfter":  "2026-10-18T20:00",          // optional, default end day 23:59; everything later is skipped
+    "waterways": {                               // optional, only for "boat": OSM names of navigable rivers/canals
+      "rivers": ["Shannon", "Boyle"],            // omitted/empty → all rivers resp. canals in the area
+      "canals": ["Jamestown Canal", "Boyle Canal"]  // unnamed canals ≤ 1.5 km (locks) are always included
+    },
     "kinds":  { "2026-10-09T13:30": "ebike" },   // override detected kind, key = local start time
     "labels": { "2026-10-05T18:06": "Sindelfingen → Ohlsbach" }
   },

@@ -6,7 +6,7 @@ description: Builds and maintains an interactive travel diary website (dark sate
 # Travel Diary
 
 Turns a trip's raw material into a scrollytelling website: one card per day over a fixed satellite map,
-movement segments (camper, car, bike, on foot, ferry) drawn on the map, photos and videos pinned at their
+movement segments (camper, car, bike, on foot, ferry, houseboat) drawn on the map, photos and videos pinned at their
 position, info points ("Unterwegs" / "Along the way") with Wikimedia Commons images, and a **replay** per day
 that flies the route in 3D with stats, elevation profile and the photos popping up where they were taken.
 
@@ -86,6 +86,10 @@ Keep `CLAUDE.md` in the project current (it is the hand-off document for the nex
   (`PXL_YYYYMMDD_HHMMSS`) and their position from the timeline, GPX, a stop, or the nearest photo.
 - GPX beats the timeline: timeline activities overlapping a GPX track are dropped.
 - Without a Google Timeline, drives are routed between named places via `days[].legs`.
+- Houseboat trips: kind `boat` routes along OSM rivers/canals (`scripts/waterway.mjs`, optional
+  `timeline.waterways` whitelist) and uses photo EXIF positions as waypoints – see `references/day-workflow.md`.
+- Desktop (≥ 900 px): map left 50 %, story right 50 % with a large photo grid; the replay shows photo cards
+  on the right and groups photos taken within 15 min (max. 6) on one card (mobile unchanged).
 - Elevation profiles over motorway tunnels show the terrain above; that is why elevation gain is only
   counted for bike/foot.
 - All UI text is in `src/i18n.ts` (de, en); adding a language is one more dictionary.
