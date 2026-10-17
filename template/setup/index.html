@@ -1,0 +1,159 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Travel Diary – Setup</title>
+<style>
+  :root { --bg:#07090c; --ink:#ece7df; --muted:#9aa0ab; --line:rgb(255 255 255/.1); --surface:rgb(13 16 21/.9); --accent:#ff8a3d; font-family:Inter,system-ui,sans-serif; color-scheme:dark; }
+  * { box-sizing:border-box } body { margin:0; background:var(--bg); color:var(--ink); }
+  .wrap { max-width:760px; margin:0 auto; padding:2rem 1.25rem 4rem; }
+  h1 { font-family:Georgia,serif; font-weight:400; font-style:italic; font-size:2.2rem; margin:0 0 .25rem } h1::after{content:'.';color:var(--accent);font-style:normal}
+  h2 { font-size:1.2rem; margin:1.5rem 0 .75rem } p.muted,small { color:var(--muted) }
+  .steps { display:flex; gap:.4rem; margin:1rem 0 1.5rem } .steps span { flex:1; height:4px; border-radius:2px; background:var(--line) } .steps span.on { background:var(--accent) }
+  .card { background:var(--surface); border:1px solid var(--line); border-radius:18px; padding:1.25rem 1.25rem 1.4rem; margin-bottom:1rem }
+  label { display:block; font-size:.78rem; text-transform:uppercase; letter-spacing:.1em; color:var(--muted); margin:.9rem 0 .3rem }
+  input,select,textarea { width:100%; padding:.65rem .8rem; border-radius:10px; border:1px solid var(--line); background:rgb(255 255 255/.05); color:var(--ink); font:inherit }
+  textarea { min-height:180px; line-height:1.5 }
+  .row { display:grid; grid-template-columns:1fr 1fr; gap:.75rem } @media (max-width:560px){ .row{grid-template-columns:1fr} }
+  .btn { display:inline-flex; align-items:center; gap:.5rem; padding:.75rem 1.2rem; border-radius:999px; border:0; font:inherit; font-weight:600; cursor:pointer; background:var(--ink); color:#0b0d10 }
+  .btn.primary { background:var(--accent); color:#1a0d05 } .btn.ghost { background:rgb(255 255 255/.1); color:var(--ink) } .btn:disabled{opacity:.5;cursor:default}
+  .actions { display:flex; gap:.6rem; justify-content:space-between; margin-top:1.25rem; flex-wrap:wrap }
+  .lang { display:grid; grid-template-columns:1fr 1fr; gap:.75rem } .lang button { padding:1.2rem; border-radius:14px; border:1px solid var(--line); background:rgb(255 255 255/.05); color:var(--ink); font:inherit; font-size:1.1rem; cursor:pointer } .lang button.on { border-color:var(--accent); background:color-mix(in srgb,var(--accent) 15%,transparent) }
+  .chips { display:flex; flex-wrap:wrap; gap:.4rem } .chips label { display:inline-flex; align-items:center; gap:.35rem; margin:0; padding:.4rem .7rem; border-radius:999px; border:1px solid var(--line); text-transform:none; letter-spacing:0; font-size:.85rem; color:var(--ink); cursor:pointer } .chips input{width:auto}
+  .drop { border:2px dashed rgb(255 255 255/.25); border-radius:14px; padding:1.4rem; text-align:center; color:var(--muted); cursor:pointer; transition:.15s } .drop.over { border-color:var(--accent); color:var(--ink); background:color-mix(in srgb,var(--accent) 10%,transparent) }
+  .drop b { color:var(--ink) } .drop input{display:none}
+  .drops { display:grid; grid-template-columns:1fr 1fr; gap:.75rem; margin-top:.75rem } @media (max-width:560px){ .drops{grid-template-columns:1fr} }
+  .prog { height:4px; background:var(--line); border-radius:2px; overflow:hidden; margin-top:.5rem } .prog b { display:block; height:100%; width:0; background:var(--accent) }
+  .log { font-size:.8rem; color:var(--muted); margin-top:.5rem; max-height:7rem; overflow:auto }
+  .days { display:flex; flex-direction:column; gap:.4rem; margin:.5rem 0 } .days button { text-align:left; padding:.6rem .8rem; border-radius:10px; border:1px solid var(--line); background:rgb(255 255 255/.04); color:var(--ink); font:inherit; cursor:pointer } .days button b{color:var(--accent)}
+  code { background:rgb(255 255 255/.08); padding:.1rem .4rem; border-radius:6px }
+  .done { text-align:center; padding:2rem 1rem } .done .big { font-size:3rem }
+  .status { display:grid; grid-template-columns:repeat(4,1fr); gap:.5rem; margin-top:.75rem } .status div { background:rgb(255 255 255/.05); border-radius:10px; padding:.6rem; text-align:center } .status b { display:block; font-size:1.3rem } .status span { font-size:.7rem; color:var(--muted); text-transform:uppercase; letter-spacing:.08em }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1 id="h1">Travel Diary</h1>
+  <p class="muted" id="sub"></p>
+  <div class="steps"><span id="s1"></span><span id="s2"></span><span id="s3"></span><span id="s4"></span></div>
+  <div id="view"></div>
+</div>
+<script>
+const I = {
+  de: { sub:'Sammle hier alles für dein interaktives Reisetagebuch ein. Danach macht Claude Code weiter.',
+    lang:'Sprache', pickLang:'In welcher Sprache soll das Tagebuch erscheinen?', next:'Weiter ›', back:'‹ Zurück',
+    trip:'Deine Reise', title:'Titel', subtitle:'Untertitel (Stationen)', start:'Erster Tag', end:'Letzter Tag', tz:'Zeitzone', vehicles:'Wie bist du unterwegs?',
+    out:'Ausgabe', outSingle:'Eine HTML-Datei zum Verschicken', outWeb:'Online (Webspace per SSH, mit Passwort)', outNas:'Synology / eigener nginx', accent:'Akzentfarbe',
+    days:'Tage', dayHint:'Lege für jeden Reisetag einen Eintrag an. Fotos, Videos, GPX und die Google-Zeitachse kannst du jederzeit nachreichen.', date:'Datum', dayTitle:'Titel des Tages', text:'Tagebuchtext (Markdown erlaubt)',
+    saveDay:'Tag speichern', newDay:'+ Neuer Tag', existing:'Bisherige Tage',
+    files:'Dateien', photos:'Fotos (JPG/HEIC)', videos:'Videos (MP4)', gpx:'GPX-Tracks (Komoot, Garmin, Strava …)', timeline:'Google-Zeitachse (Zeitachse.json / Timeline.json)',
+    dropHint:'Dateien hierher ziehen oder <b>klicken</b>', uploaded:'hochgeladen', tlHint:'Android: Einstellungen → Standort → Zeitachse → Exportieren. Ohne Zeitachse werden Fahrten zwischen den Orten geroutet.',
+    finish:'Fertig – weiter in Claude Code', doneTitle:'Alles eingesammelt', doneText:'Wechsle jetzt zu Claude Code und tippe:', doneText2:'Claude verarbeitet Fotos, Routen und Text, schreibt Bildunterschriften, schlägt Info-Punkte vor und baut die Seite. Diese Seite kannst du jederzeit wieder mit <code>npm run setup</code> öffnen, um weitere Tage nachzutragen.',
+    stPhotos:'Fotos', stVideos:'Videos', stGpx:'GPX', stTl:'Zeitachse', yes:'ja', no:'nein', saved:'Gespeichert', err:'Fehler' },
+  en: { sub:'Collect everything for your interactive travel diary here. Claude Code takes it from there.',
+    lang:'Language', pickLang:'Which language should the diary use?', next:'Next ›', back:'‹ Back',
+    trip:'Your trip', title:'Title', subtitle:'Subtitle (stops)', start:'First day', end:'Last day', tz:'Time zone', vehicles:'How do you travel?',
+    out:'Output', outSingle:'A single HTML file to share', outWeb:'Online (web space via SSH, password protected)', outNas:'Synology / own nginx', accent:'Accent colour',
+    days:'Days', dayHint:'Create an entry for each day of the trip. Photos, videos, GPX and the Google Timeline can be added any time.', date:'Date', dayTitle:'Title of the day', text:'Diary text (Markdown allowed)',
+    saveDay:'Save day', newDay:'+ New day', existing:'Days so far',
+    files:'Files', photos:'Photos (JPG/HEIC)', videos:'Videos (MP4)', gpx:'GPX tracks (Komoot, Garmin, Strava …)', timeline:'Google Timeline export (Timeline.json)',
+    dropHint:'Drop files here or <b>click</b>', uploaded:'uploaded', tlHint:'Android: Settings → Location → Timeline → Export. Without it, drives are routed between the places you name.',
+    finish:'Done – continue in Claude Code', doneTitle:'All collected', doneText:'Switch to Claude Code and type:', doneText2:'Claude processes photos, routes and text, writes captions, suggests points of interest and builds the site. Reopen this page any time with <code>npm run setup</code> to add more days.',
+    stPhotos:'Photos', stVideos:'Videos', stGpx:'GPX', stTl:'Timeline', yes:'yes', no:'no', saved:'Saved', err:'Error' },
+};
+const KINDS = { camper:{de:'Camper',en:'Camper'}, car:{de:'Auto',en:'Car'}, ebike:{de:'E-Bike',en:'E-bike'}, bike:{de:'Rad',en:'Bike'}, walk:{de:'zu Fuß',en:'On foot'}, hike:{de:'Wandern',en:'Hiking'}, ferry:{de:'Fähre',en:'Ferry'}, train:{de:'Zug',en:'Train'} };
+let S = { lang: null, step: 1, trip: null, files: {}, diary: '', editing: null };
+const $ = (s) => document.querySelector(s);
+const t = (k) => (I[S.lang ?? 'de'])[k];
+const api = async (m, u, b) => { const r = await fetch(u, { method: m, headers: b instanceof Blob ? {} : { 'Content-Type': 'application/json' }, body: b instanceof Blob ? b : b ? JSON.stringify(b) : undefined }); return r.json(); };
+
+async function load() {
+  const st = await api('GET', '/api/state');
+  S.trip = st.trip; S.files = st.files; S.diary = st.diary;
+  if (st.trip?.lang) { S.lang = st.trip.lang; S.step = st.trip.title ? 3 : 2; }
+  render();
+}
+function steps() { for (let i = 1; i <= 4; i++) $('#s' + i).classList.toggle('on', i <= S.step); $('#sub').textContent = S.lang ? t('sub') : I.de.sub + ' / ' + I.en.sub; }
+
+function render() {
+  steps(); const v = $('#view');
+  if (S.step === 1) v.innerHTML = `<div class="card"><h2>${I.de.pickLang} / ${I.en.pickLang}</h2>
+    <div class="lang"><button class="${S.lang==='de'?'on':''}" onclick="pick('de')">🇩🇪 Deutsch</button><button class="${S.lang==='en'?'on':''}" onclick="pick('en')">🇬🇧 English</button></div></div>`;
+  else if (S.step === 2) renderTrip(v);
+  else if (S.step === 3) renderDays(v);
+  else renderDone(v);
+}
+function pick(l) { S.lang = l; S.step = 2; render(); }
+
+function renderTrip(v) {
+  const tr = S.trip ?? {}; const L = S.lang;
+  v.innerHTML = `<div class="card"><h2>${t('trip')}</h2>
+    <label>${t('title')}</label><input id="f-title" value="${esc(tr.title ?? '')}" placeholder="${L==='de'?'Camper-Tour 2026':'Road trip 2026'}">
+    <label>${t('subtitle')}</label><input id="f-subtitle" value="${esc(tr.subtitle ?? '')}" placeholder="${L==='de'?'Schwarzwald · Schweiz · Gardasee':'Norway · Lofoten · Senja'}">
+    <div class="row"><div><label>${t('start')}</label><input id="f-start" type="date" value="${tr.start ?? ''}"></div><div><label>${t('end')}</label><input id="f-end" type="date" value="${tr.end ?? ''}"></div></div>
+    <label>${t('tz')}</label><input id="f-tz" value="${esc(tr.timezone ?? Intl.DateTimeFormat().resolvedOptions().timeZone)}">
+    <label>${t('vehicles')}</label><div class="chips">${Object.entries(KINDS).map(([k,n]) => `<label><input type="checkbox" name="veh" value="${k}" ${(tr.vehicles ?? ['camper','ebike','walk']).includes(k)?'checked':''}> ${n[L]}</label>`).join('')}</div>
+    <label>${t('out')}</label><select id="f-out"><option value="single" ${tr.output==='single'?'selected':''}>${t('outSingle')}</option><option value="web" ${tr.output==='web'?'selected':''}>${t('outWeb')}</option><option value="nas" ${tr.output==='nas'?'selected':''}>${t('outNas')}</option></select>
+    <label>${t('accent')}</label><input id="f-accent" type="color" value="${tr.accent ?? '#ff8a3d'}" style="height:2.6rem;padding:.2rem">
+    <div class="actions"><button class="btn ghost" onclick="S.step=1;render()">${t('back')}</button><button class="btn primary" onclick="saveTrip()">${t('next')}</button></div></div>`;
+}
+async function saveTrip() {
+  const vehicles = [...document.querySelectorAll('input[name=veh]:checked')].map((i) => i.value);
+  const body = { title: $('#f-title').value.trim() || 'Travel Diary', subtitle: $('#f-subtitle').value.trim(), start: $('#f-start').value, end: $('#f-end').value, timezone: $('#f-tz').value.trim() || 'Europe/Berlin', lang: S.lang, vehicles, output: $('#f-out').value, accent: $('#f-accent').value };
+  if (!body.start || !body.end) { alert(t('start') + ' / ' + t('end')); return; }
+  await api('POST', '/api/trip', body);
+  S.trip = { ...(S.trip ?? {}), ...body }; S.step = 3; await refresh(); render();
+}
+async function refresh() { const st = await api('GET', '/api/state'); S.trip = st.trip; S.files = st.files; S.diary = st.diary; }
+
+function dayText(n) { const m = S.diary.match(new RegExp(`^## (?:Tag|Day) ${n} [^\\n]*\\n([\\s\\S]*?)(?=^## (?:Tag|Day) |(?![\\s\\S]))`, 'm')); return m ? m[1].trim() : ''; }
+function renderDays(v) {
+  const days = S.trip?.days ?? []; const e = S.editing ?? {};
+  v.innerHTML = `<div class="card"><h2>${t('days')}</h2><p class="muted">${t('dayHint')}</p>
+    ${days.length ? `<label>${t('existing')}</label><div class="days">${days.map((d) => `<button onclick="editDay('${d.date}')"><b>${String(d.n).padStart(2,'0')}</b> ${d.date} · ${esc(d.title)}</button>`).join('')}</div>` : ''}
+    <div class="row"><div><label>${t('date')}</label><input id="d-date" type="date" value="${e.date ?? nextDate(days)}"></div><div><label>${t('dayTitle')}</label><input id="d-title" value="${esc(e.title ?? '')}"></div></div>
+    <label>${t('text')}</label><textarea id="d-text">${esc(e.text ?? '')}</textarea>
+    <div class="actions"><button class="btn ghost" onclick="S.editing=null;render()">${t('newDay')}</button><button class="btn" onclick="saveDay()">${t('saveDay')}</button></div></div>
+    <div class="card"><h2>${t('files')}</h2>
+    <div class="status"><div><b>${S.files.photos}</b><span>${t('stPhotos')}</span></div><div><b>${S.files.video}</b><span>${t('stVideos')}</span></div><div><b>${S.files.gpx}</b><span>${t('stGpx')}</span></div><div><b>${S.files.timeline ? t('yes') : t('no')}</b><span>${t('stTl')}</span></div></div>
+    <div class="drops">${drop('photos', t('photos'), 'image/*,.heic')}${drop('video', t('videos'), 'video/mp4,video/*')}${drop('gpx', t('gpx'), '.gpx')}${drop('timeline', t('timeline'), '.json')}</div>
+    <small>${t('tlHint')}</small><div class="prog"><b id="prog"></b></div><div class="log" id="log"></div>
+    <div class="actions"><button class="btn ghost" onclick="S.step=2;render()">${t('back')}</button><button class="btn primary" onclick="S.step=4;render()">${t('finish')}</button></div></div>`;
+  document.querySelectorAll('.drop').forEach((d) => {
+    const inp = d.querySelector('input');
+    d.addEventListener('click', () => inp.click());
+    inp.addEventListener('change', () => upload(d.dataset.kind, [...inp.files]));
+    ['dragenter','dragover'].forEach((ev) => d.addEventListener(ev, (e) => { e.preventDefault(); d.classList.add('over'); }));
+    ['dragleave','drop'].forEach((ev) => d.addEventListener(ev, (e) => { e.preventDefault(); d.classList.remove('over'); }));
+    d.addEventListener('drop', (e) => upload(d.dataset.kind, [...e.dataTransfer.files]));
+  });
+}
+const drop = (kind, label, accept) => `<div class="drop" data-kind="${kind}"><div>${label}</div><small>${t('dropHint')}</small><input type="file" multiple accept="${accept}"></div>`;
+function nextDate(days) { if (!days.length) return S.trip?.start ?? ''; const d = new Date(days[days.length-1].date + 'T12:00:00'); d.setDate(d.getDate() + 1); return d.toISOString().slice(0, 10); }
+function editDay(date) { const d = S.trip.days.find((x) => x.date === date); S.editing = { date, title: d.title, text: dayText(d.n) }; render(); window.scrollTo(0, 0); }
+async function saveDay() {
+  const date = $('#d-date').value, title = $('#d-title').value.trim(), text = $('#d-text').value;
+  if (!date || !title) { alert(t('date') + ' / ' + t('dayTitle')); return; }
+  const r = await api('POST', '/api/day', { date, title, text });
+  S.editing = null; await refresh(); render(); log(`${t('saved')}: ${date} · ${title}`);
+}
+async function upload(kind, files) {
+  let done = 0; const bar = $('#prog');
+  for (const f of files) {
+    try { await fetch(`/api/upload?kind=${kind}&name=${encodeURIComponent(f.name)}`, { method: 'PUT', body: f }); log(`${f.name} ${t('uploaded')}`); }
+    catch (e) { log(`${t('err')}: ${f.name}`); }
+    done++; bar.style.width = `${(done / files.length) * 100}%`;
+  }
+  await refresh(); const keep = $('#log').innerHTML; render(); $('#log').innerHTML = keep;
+}
+function log(m) { const l = $('#log'); if (l) { l.insertAdjacentHTML('afterbegin', `<div>${esc(m)}</div>`); } }
+function renderDone(v) {
+  v.innerHTML = `<div class="card done"><div class="big">✅</div><h2>${t('doneTitle')}</h2><p>${t('doneText')}</p><p><code>/traveldiary day</code></p><p class="muted">${t('doneText2')}</p>
+    <div class="actions" style="justify-content:center"><button class="btn ghost" onclick="S.step=3;render()">${t('back')}</button></div></div>`;
+}
+const esc = (s) => String(s).replace(/[&<>"]/g, (c) => ({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;' }[c]));
+load();
+</script>
+</body>
+</html>

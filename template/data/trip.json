@@ -1,0 +1,13 @@
+{
+  "title": "Travel Diary",
+  "subtitle": "",
+  "lang": "de",
+  "start": "2026-01-01",
+  "end": "2026-01-07",
+  "timezone": "Europe/Berlin",
+  "vehicles": ["camper", "ebike", "walk"],
+  "output": "single",
+  "places": {},
+  "timeline": { "ignoreBefore": "2026-01-01T00:00", "kinds": {}, "labels": {} },
+  "days": []
+}

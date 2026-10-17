@@ -1,0 +1,64 @@
+<!doctype html>
+<html lang="de">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+    <meta name="theme-color" content="#07090c" />
+    <title>Travel Diary</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,600;1,9..144,300;1,9..144,600&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  </head>
+  <body>
+    <div class="stage">
+      <div id="map" class="map"></div>
+      <div class="vignette"></div>
+    </div>
+
+    <main id="story" class="story"></main>
+
+    <div id="replay" class="replay" hidden>
+      <div class="replay-top">
+        <div class="replay-progress"></div>
+        <div class="replay-head">
+          <span class="replay-day"></span>
+          <button class="icon-btn" data-act="close" data-i18n-aria="close" aria-label="Close">✕</button>
+        </div>
+        <div class="replay-stats">
+          <div><span data-i18n="replay.distance">Distanz</span><strong data-stat="dist">0</strong><em>km</em></div>
+          <div><span data-i18n="replay.ascent">Höhenmeter</span><strong data-stat="asc">0</strong><em>m</em></div>
+          <div><span data-i18n="replay.time">Zeit</span><strong data-stat="time">0:00</strong><em data-stat="time-unit">min</em></div>
+        </div>
+      </div>
+      <div class="replay-label">
+        <span class="replay-kind"></span>
+        <span class="replay-title"></span>
+        <span class="replay-clock"></span>
+      </div>
+      <figure class="replay-photo" hidden><div class="replay-media"><img alt="" /><button class="replay-next" type="button" data-i18n="replay.nextCard">Weiter ›</button></div><figcaption></figcaption></figure>
+      <aside class="replay-info" hidden><img alt="" /><div><p class="eyebrow" data-i18n="underway">Unterwegs</p><h4></h4><p class="text"></p><small></small><button class="replay-next" type="button" data-i18n="replay.nextCard">Weiter ›</button></div></aside>
+      <div class="replay-loading" hidden><span data-i18n="replay.loading">Bilder werden geladen …</span><i><b></b></i></div>
+      <div class="replay-end" hidden>
+        <p class="eyebrow" data-i18n="replay.done">Geschafft</p>
+        <h3></h3>
+        <div class="end-stats"></div>
+        <div class="end-actions"><button class="btn" data-act="again" data-i18n="replay.again">Nochmal</button><button class="btn ghost" data-act="close" data-i18n="replay.back">Zurück zum Tagebuch</button></div>
+      </div>
+      <div class="replay-bottom">
+        <div class="profile-wrap">
+          <div class="profile-meta"><span class="profile-max"></span><span class="profile-len"></span></div>
+          <svg class="profile" viewBox="0 0 100 40" preserveAspectRatio="none"></svg>
+          <div class="profile-meta"><span class="profile-min"></span><span data-i18n="replay.profile">Höhenprofil</span></div>
+        </div>
+        <div class="replay-controls">
+          <button class="ctl" data-act="toggle" data-i18n-aria="replay.pause" aria-label="Pause">❚❚</button>
+          <button class="ctl" data-act="next" data-i18n-aria="replay.skip" aria-label="Next segment">⏭</button>
+          <button class="ctl" data-act="speed" data-i18n-aria="replay.speed" aria-label="Speed">1×</button>
+        </div>
+      </div>
+    </div>
+
+    <div id="lightbox" class="lightbox" hidden></div>
+    <script type="module" src="/src/main.ts"></script>
+  </body>
+</html>

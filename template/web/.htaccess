@@ -1,0 +1,42 @@
+# Camper-Tour 2026 – Apache-Konfiguration für den Webspace (wird von deploy-web.sh mit ausgeliefert)
+
+# Immer HTTPS
+<IfModule mod_rewrite.c>
+  RewriteEngine On
+  RewriteCond %{HTTPS} !=on
+  RewriteRule ^ https://%{HTTP_HOST}%{REQUEST_URI} [L,R=301]
+</IfModule>
+
+# AUTH-START
+AuthType Basic
+AuthName "Camper-Tour 2026"
+AuthUserFile __HTPASSWD__
+Require valid-user
+# AUTH-END
+
+# .htpasswd nie ausliefern
+<Files ".htpasswd">
+  Require all denied
+</Files>
+
+# Caching: Seite und Daten frisch, Fotos/Videos/gehashte Assets lange
+<IfModule mod_headers.c>
+  <FilesMatch "\.(html|json)$">
+    Header set Cache-Control "no-cache"
+  </FilesMatch>
+  <FilesMatch "\.(webp|jpg|mp4)$">
+    Header set Cache-Control "public, max-age=2592000"
+  </FilesMatch>
+  <FilesMatch "\.(js|css)$">
+    Header set Cache-Control "public, max-age=31536000, immutable"
+  </FilesMatch>
+</IfModule>
+
+# Kompression für Text
+<IfModule mod_deflate.c>
+  AddOutputFilterByType DEFLATE text/html text/css application/javascript application/json
+</IfModule>
+
+# Videos per Range-Request (Spulen) – Apache kann das von Haus aus
+AddType video/mp4 .mp4
+AddType image/webp .webp

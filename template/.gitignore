@@ -1,0 +1,14 @@
+node_modules
+dist
+dist-single
+.cache
+raw/photos/*
+raw/video/*
+raw/timeline/*
+!raw/*/README.md
+public/photos
+public/pois
+public/data
+inbox/
+.env.web
+.deploy-manifest
