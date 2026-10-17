@@ -10,7 +10,7 @@ const days = {};
 let intro = '';
 for (const part of parts.slice(1)) {
   const [heading, ...rest] = part.split('\n');
-  const m = heading.match(/^Tag\s+(\d+)/);
+  const m = heading.match(/^(?:Tag|Day)\s+(\d+)/i);
   // Arbeitsnotizen am Ende eines Tages (z. B. „**Für die Webseite:**“ / „**Notes for the site:**“) nicht anzeigen
   if (m) days[m[1]] = { heading: heading.trim(), markdown: rest.join('\n').replace(/\*\*(Für die Webseite|Notes for the site|TODO):\*\*[\s\S]*$/i, '').trim() };
   else if (/Stationen/i.test(heading)) intro = rest.join('\n').trim();
