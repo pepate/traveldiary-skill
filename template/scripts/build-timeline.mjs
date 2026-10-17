@@ -11,6 +11,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import sharp from 'sharp';
 import { ROOT, OUT, readJSON, writeJSON, trip, haversine } from './lib.mjs';
+import { loadWaterways, routeOnWater } from './waterway.mjs';
 
 const SRC = path.join(ROOT, 'raw', 'timeline', 'Zeitachse.json');
 const CACHE = path.join(ROOT, 'data', 'timeline');
@@ -18,7 +19,7 @@ const t = trip();
 const cfg = t.timeline ?? {};
 const KIND = {
   IN_PASSENGER_VEHICLE: 'camper', IN_VEHICLE: 'camper', CYCLING: 'ebike', ON_BICYCLE: 'ebike', SKIING: 'ebike', MOTORCYCLING: 'ebike',
-  WALKING: 'walk', ON_FOOT: 'walk', RUNNING: 'walk', HIKING: 'hike', IN_FERRY: 'ferry', IN_BUS: 'bus', IN_TRAIN: 'train',
+  WALKING: 'walk', ON_FOOT: 'walk', RUNNING: 'walk', HIKING: 'hike', IN_FERRY: 'ferry', IN_BUS: 'bus', IN_TRAIN: 'train', SAILING: 'boat',
 };
 const PROFILE = { camper: ['car'], car: ['car'], ebike: ['bike', 'foot'], bike: ['bike', 'foot'], walk: ['foot'], hike: ['foot'] };
 const MERGE_GAP_MIN = 20;   // gleiche Art, kurze Pause dazwischen → ein Segment
@@ -41,9 +42,14 @@ const positions = raw.rawSignals
   .map((r) => r.position).filter((p) => p && p.timestamp >= t.start && p.accuracyMeters <= 150)
   .map((p) => ({ ms: Date.parse(p.timestamp), c: ll(p.LatLng), acc: p.accuracyMeters }))
   .sort((a, b) => a.ms - b.ms);
+// Fotos mit EXIF-GPS als zusätzliche Wegpunkte für Boot/Fähre (die Timeline hat auf dem Wasser oft nur Start und Ziel)
+const PHOTOS = path.join(OUT, 'photos.json');
+const photoPts = fs.existsSync(PHOTOS) ? readJSON(PHOTOS).filter((p) => p.posSource === 'exif' && p.lat != null)
+  .map((p) => ({ ms: Date.parse(p.taken), c: [p.lon, p.lat], acc: 20 })) : [];
 
 // Aktivitäten und Aufenthalte
-const segs = raw.semanticSegments.filter((s) => s.startTime >= ignoreBefore && (s.activity || s.visit));
+const ignoreAfter = cfg.ignoreAfter ?? `${t.end}T23:59`;
+const segs = raw.semanticSegments.filter((s) => s.startTime >= ignoreBefore && s.startTime <= ignoreAfter && (s.activity || s.visit));
 let acts = [], stops = [];
 for (const s of segs) {
   const startMs = Date.parse(s.startTime), endMs = Date.parse(s.endTime);
@@ -53,9 +59,10 @@ for (const s of segs) {
     if (!kind) { console.warn(`  ${localKey(s.startTime)}: unbekannte Aktivität ${type}`); continue; }
     if ((a.distanceMeters ?? 0) < MIN_DIST_M) continue;
     // Ausreißer entfernen: Punkte, die eine unplausible Geschwindigkeit zum letzten behaltenen Punkt bedeuten
-    const vmax = { walk: 2.5, hike: 2.5, ebike: 14, bike: 14, ferry: 12 }[kind] ?? 50;
+    const vmax = { walk: 2.5, hike: 2.5, ebike: 14, bike: 14, ferry: 12, boat: 6 }[kind] ?? 50;
     const kept = [];
-    for (const p of positions.filter((p) => p.ms >= startMs && p.ms <= endMs)) {
+    const src = kind === 'boat' || kind === 'ferry' ? [...positions, ...photoPts].sort((a, b) => a.ms - b.ms) : positions;
+    for (const p of src.filter((p) => p.ms >= startMs && p.ms <= endMs)) {
       const q = kept.at(-1);
       if (q && haversine(q.c, p.c) / Math.max(1, (p.ms - q.ms) / 1000) > vmax) continue;
       kept.push(p);
@@ -196,6 +203,15 @@ function upDown(ele, w = 3) {
   return { up: Math.round(up), down: Math.round(down) };
 }
 
+// Hausboot: Wasserwege aus OSM als Graph (nur laden, wenn es Bootsfahrten gibt)
+const boats = merged.filter((a) => a.kind === 'boat');
+let water = null;
+if (boats.length) {
+  const all = boats.flatMap((a) => a.pts), lons = all.map((c) => c[0]), lats = all.map((c) => c[1]);
+  try { water = await loadWaterways([Math.min(...lats) - 0.05, Math.min(...lons) - 0.05, Math.max(...lats) + 0.05, Math.max(...lons) + 0.05]); }
+  catch (e) { console.warn(`  Wasserwege nicht geladen (${e.message}) → Rohpunkte`); }
+}
+
 const result = [];
 for (const a of merged) {
   if (overlapsGpx(a)) { console.log(`  ${localKey(a.start)} ${a.kind}: durch GPX ersetzt`); continue; }
@@ -206,7 +222,9 @@ for (const a of merged) {
     c = { coords: thin(a.pts, a.accs, 1e9, 120)[0], source: 'raw' };
     // Google unterschätzt die Distanz bei Lücken – Referenz ist das Maximum aus Google-Angabe und ausgedünnter Rohspur
     a.rawDist = Math.max(a.rawDist, dist(c.coords));
-    try {
+    const route = a.kind === 'boat' && water ? routeOnWater(water, thin(a.pts, a.accs, 40, 800)[0]) : null;
+    if (route) c = { coords: route, source: 'waterway' };
+    else try {
       const r = await snap(a.kind, a.pts, a.accs, a.rawDist);
       if (r && dist(r.coords) < 1.5 * a.rawDist + 1000 && dist(r.coords) > 0.6 * a.rawDist) c = r;
       else if (r) console.warn(`  ${id}: Route unplausibel → Rohpunkte`);

@@ -1,5 +1,5 @@
 export type LngLat = [number, number] | [number, number, number];
-export type Kind = 'camper' | 'car' | 'ebike' | 'bike' | 'walk' | 'hike' | 'ferry' | 'bus' | 'train';
+export type Kind = 'camper' | 'car' | 'ebike' | 'bike' | 'walk' | 'hike' | 'ferry' | 'bus' | 'train' | 'boat';
 
 export interface Place { name: string; lat: number; lon: number; note?: string }
 

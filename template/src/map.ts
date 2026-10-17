@@ -37,10 +37,10 @@ const STYLE: maplibregl.StyleSpecification = {
 
 export const COLORS: Record<Kind, string> = {
   camper: '#ff8a3d', car: '#c7c9cf', ebike: '#2ee6c5', bike: '#2ee6c5',
-  walk: '#c3f53c', hike: '#c3f53c', ferry: '#6aa9ff', bus: '#c7c9cf', train: '#c7c9cf',
+  walk: '#c3f53c', hike: '#c3f53c', ferry: '#6aa9ff', bus: '#c7c9cf', train: '#c7c9cf', boat: '#4fc3ff',
 };
 export const ICONS: Record<Kind, string> = {
-  camper: '🚐', car: '🚗', ebike: '🚲', bike: '🚲', walk: '🚶', hike: '🥾', ferry: '⛴️', bus: '🚌', train: '🚆',
+  camper: '🚐', car: '🚗', ebike: '🚲', bike: '🚲', walk: '🚶', hike: '🥾', ferry: '⛴️', bus: '🚌', train: '🚆', boat: '🛥️',
 };
 
 type Line = { kind: Kind; coords: LngLat[] };

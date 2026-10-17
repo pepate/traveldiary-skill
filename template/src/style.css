@@ -218,17 +218,47 @@ body.replaying .vignette { background: linear-gradient(to bottom, rgb(7 9 12 / .
 .lb-count { position: absolute; top: calc(1.25rem + env(safe-area-inset-top, 0px)); left: 1rem; font-size: .75rem; color: var(--muted); }
 .error { position: fixed; bottom: 0; left: 0; right: 0; z-index: 99; background: #7f1d1d; color: #fff; padding: .8rem 1rem; margin: 0; white-space: pre-wrap; font-size: .8rem; cursor: pointer; }
 
-/* ---------- Desktop: Story links, Karte rechts ---------- */
+/* ---------- Desktop: Karte links 50 %, Story (Text + Fotos) rechts 50 % ---------- */
 @media (min-width: 900px) {
-  .hero { padding: 0 3rem 4rem; align-items: center; }
+  :root { --story-w: 50vw; }
+  .stage { right: auto; width: 50vw; }
+  .story { margin-left: 50vw; min-height: 100dvh; background: var(--bg); }
+  .hero { padding: 0 3rem 4rem; align-items: center; background: none; }
   .hero-text { max-width: 620px; }
   .stats { grid-template-columns: repeat(3, 1fr); max-width: 560px; }
-  .daynav { width: var(--story-w); padding-left: 2.5rem; }
-  .spacer { height: 14vh; }
-  .card { width: calc(var(--story-w) - 2.5rem); margin: 0 0 2rem 2.5rem; padding: 1.8rem 1.8rem 2rem; }
-  .shot img { max-width: 420px; }
+  .daynav { padding-left: 2rem; }
+  .spacer { height: 6vh; }
+  .card { margin: 0 2rem 2rem; padding: 2rem 2.2rem 2.2rem; background: rgb(255 255 255 / .03); backdrop-filter: none; -webkit-backdrop-filter: none; box-shadow: none; }
+  .prose { font-size: 1.02rem; max-width: 70ch; }
+  /* Fotos als großes Raster statt schmaler Querleiste */
+  .gallery { display: grid; grid-template-columns: repeat(2, 1fr); gap: .6rem; overflow: visible; margin: 1.25rem 0 0; padding: 0; }
+  .shot { height: auto; aspect-ratio: 4 / 3; }
+  .shot:nth-child(3n+1) { grid-column: span 2; aspect-ratio: 3 / 2; }
+  .shot img { width: 100%; height: 100%; max-width: none; object-fit: cover; }
   .btn.play { width: auto; }
-  .replay-stats { max-width: 480px; }
-  .replay-bottom { max-width: 760px; width: 100%; margin: 0 auto; }
+  /* Replay: Karte und Steuerung links, Foto- und Infokarten groß rechts */
+  .replay-top, .replay-bottom { width: 50vw; }
+  .replay-label { max-width: calc(50vw - 2rem); }
+  .replay-photo, .replay-info { left: 75%; }
+  .replay-photo { width: min(44vw, 860px); }
+  .replay-photo img { max-height: 78vh; object-fit: contain; background: #000; }
+  .replay-photo figcaption { font-size: .95rem; margin-top: .75rem; }
+  .replay-info { width: min(40vw, 640px); }
+  .replay-info img { height: 44vh; max-height: 460px; }
+  .replay-info p.text { font-size: .98rem; }
+  .replay-loading, .replay-end { left: 25%; }
+  /* Fotogruppen im Replay */
+  .rp-grid { display: grid; gap: .5rem; }
+  .rp-grid:not([data-n="1"]) { grid-template-columns: 1fr 1fr; }
+  .rp-grid[data-n="3"] .rp-cell:first-child { grid-column: span 2; }
+  .rp-grid[data-n="5"], .rp-grid[data-n="6"] { grid-template-columns: repeat(3, 1fr); }
+  .rp-grid[data-n="5"] .rp-cell:first-child { grid-column: span 2; }
+  .replay-photo.multi img { aspect-ratio: 4 / 3; height: auto; max-height: 36vh; object-fit: cover; border-width: 1px; }
+  .rp-grid[data-n="5"] img, .rp-grid[data-n="6"] img { max-height: 30vh; }
+  .rp-cell { position: relative; min-width: 0; }
+  .rp-cell span { position: absolute; left: 1px; right: 1px; bottom: 1px; padding: 1.2rem .7rem .5rem; font-size: .8rem; line-height: 1.3; border-radius: 0 0 16px 16px;
+    background: linear-gradient(transparent, rgb(0 0 0 / .8)); text-shadow: 0 1px 2px #000; pointer-events: none; }
+  .replay-photo.multi .replay-next { position: static; transform: none; display: block; margin: .8rem auto 0; }
+  .replay-photo.multi .replay-next:active { transform: scale(.96); }
 }
 @media (prefers-reduced-motion: reduce) { .scroll-hint, .pop { animation: none; } html { scroll-behavior: auto; } }

@@ -59,7 +59,7 @@ async function main() {
   const allSegs = [...days.values()].flatMap((d) => d.segments);
   const sum = (kinds: Kind[]) => allSegs.filter((s) => kinds.includes(s.kind)).reduce((a, s) => a + s.distanceM, 0);
   // Kennzahlen im Hero: eine Kachel je Fortbewegungsart aus trip.json → vehicles (Standard: alles, was vorkommt)
-  const GROUPS: Record<string, Kind[]> = { camper: ['camper'], car: ['car'], ebike: ['ebike', 'bike'], bike: ['ebike', 'bike'], walk: ['walk', 'hike'], hike: ['walk', 'hike'], ferry: ['ferry'], bus: ['bus'], train: ['train'] };
+  const GROUPS: Record<string, Kind[]> = { camper: ['camper'], car: ['car'], ebike: ['ebike', 'bike'], bike: ['ebike', 'bike'], walk: ['walk', 'hike'], hike: ['walk', 'hike'], ferry: ['ferry'], bus: ['bus'], train: ['train'], boat: ['boat'] };
   const seen = new Set(allSegs.map((s) => s.kind));
   const vehicles = (trip.vehicles ?? [...seen]).filter((k, i, a) => GROUPS[k] && a.findIndex((x) => GROUPS[x][0] === GROUPS[k][0]) === i).slice(0, 3);
   const ascent = allSegs.filter((s) => ['ebike', 'bike', 'walk', 'hike'].includes(s.kind)).reduce((a, s) => a + s.ascentM, 0);
@@ -149,13 +149,14 @@ async function main() {
 
   const setPadding = () => {
     const mobile = innerWidth < 900;
-    tripMap.padding = mobile ? { top: 70, bottom: innerHeight * 0.42, left: 20, right: 20 } : { top: 80, bottom: 80, left: Math.min(560, innerWidth * 0.46), right: 40 };
+    tripMap.padding = mobile ? { top: 70, bottom: innerHeight * 0.42, left: 20, right: 20 } : { top: 80, bottom: 80, left: 40, right: 40 };
   };
   setPadding();
   addEventListener('resize', setPadding);
 }
 
-addEventListener('error', (e) => showBanner(`${T.error}: ${e.message}`));
+// MapLibre wirft beim Größenändern gelegentlich „already running“ – harmlos, kein Banner
+addEventListener('error', (e) => { if (!/already running/.test(e.message)) showBanner(`${T.error}: ${e.message}`); });
 addEventListener('unhandledrejection', (e) => showBanner(`${T.error}: ${(e as PromiseRejectionEvent).reason?.message ?? e}`));
 
 main().catch((e) => {

@@ -62,7 +62,7 @@ const I = {
     finish:'Done – continue in Claude Code', doneTitle:'All collected', doneText:'Switch to Claude Code and type:', doneText2:'Claude processes photos, routes and text, writes captions, suggests points of interest and builds the site. Reopen this page any time with <code>npm run setup</code> to add more days.',
     stPhotos:'Photos', stVideos:'Videos', stGpx:'GPX', stTl:'Timeline', yes:'yes', no:'no', saved:'Saved', err:'Error' },
 };
-const KINDS = { camper:{de:'Camper',en:'Camper'}, car:{de:'Auto',en:'Car'}, ebike:{de:'E-Bike',en:'E-bike'}, bike:{de:'Rad',en:'Bike'}, walk:{de:'zu Fuß',en:'On foot'}, hike:{de:'Wandern',en:'Hiking'}, ferry:{de:'Fähre',en:'Ferry'}, train:{de:'Zug',en:'Train'} };
+const KINDS = { camper:{de:'Camper',en:'Camper'}, car:{de:'Auto',en:'Car'}, ebike:{de:'E-Bike',en:'E-bike'}, bike:{de:'Rad',en:'Bike'}, walk:{de:'zu Fuß',en:'On foot'}, hike:{de:'Wandern',en:'Hiking'}, ferry:{de:'Fähre',en:'Ferry'}, train:{de:'Zug',en:'Train'}, boat:{de:'Hausboot',en:'Houseboat'} };
 let S = { lang: null, step: 1, trip: null, files: {}, diary: '', editing: null };
 const $ = (s) => document.querySelector(s);
 const t = (k) => (I[S.lang ?? 'de'])[k];

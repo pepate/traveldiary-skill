@@ -12,7 +12,7 @@ type Event =
 
 const VIEW: Record<string, { zoom: number; pitch: number }> = {
   camper: { zoom: 10.2, pitch: 55 }, car: { zoom: 12, pitch: 55 }, ebike: { zoom: 13.6, pitch: 62 }, bike: { zoom: 13.6, pitch: 62 },
-  walk: { zoom: 15.2, pitch: 60 }, hike: { zoom: 14.6, pitch: 62 }, ferry: { zoom: 13.5, pitch: 55 }, bus: { zoom: 12, pitch: 55 }, train: { zoom: 11, pitch: 55 },
+  walk: { zoom: 15.2, pitch: 60 }, hike: { zoom: 14.6, pitch: 62 }, ferry: { zoom: 13.5, pitch: 55 }, bus: { zoom: 12, pitch: 55 }, train: { zoom: 11, pitch: 55 }, boat: { zoom: 12.6, pitch: 55 },
 };
 const showHm = (k: Kind) => k === 'ebike' || k === 'bike' || k === 'walk' || k === 'hike';
 
@@ -131,8 +131,7 @@ export class Replay {
           // Foto erreicht?
           const ph = photoQueue[0];
           if (ph && Date.parse(ph.taken) <= tMs && !this.paused) {
-            photoQueue.shift();
-            this.showPhoto(ph).then(() => {});
+            this.showPhotos(this.takeGroup(photoQueue)).then(() => {});
           }
           const pq = poiQueue[0];
           if (pq && pq.atM <= target && !this.paused) {
@@ -145,7 +144,7 @@ export class Replay {
         this.raf = requestAnimationFrame(frame);
       });
       if (!this.running) return;
-      for (const ph of photoQueue) await this.showPhoto(ph);
+      while (photoQueue.length) await this.showPhotos(this.takeGroup(photoQueue));
       for (const pq of poiQueue) await this.showPoi(pq.poi);
       drawn.push({ kind: seg.kind, coords: seg.coords });
       totalDist += seg.distanceM; totalMs += seg.times.at(-1)! - seg.times[0];
@@ -163,7 +162,8 @@ export class Replay {
       m.easeTo({ center: [ev.stop.lon, ev.stop.lat], zoom: Math.max(m.getZoom(), 14.5), pitch: 60, bearing: m.getBearing() + 25, duration: 2200, essential: true });
       await this.wait(ev.photos.length ? 900 : 1800);
     }
-    for (const ph of ev.photos) await this.showPhoto(ph);
+    const queue = [...ev.photos];
+    while (queue.length) await this.showPhotos(this.takeGroup(queue));
   }
 
   // Karten (Foto/Info) laufen nacheinander und bleiben stehen, bis „Weiter“ getippt wird
@@ -192,15 +192,36 @@ export class Replay {
     return (this.chain = this.chain.then(run, run));
   }
 
-  private showPhoto(p: Photo) {
+  // Desktop: Fotos, die kurz nacheinander entstanden sind, als Gruppe zeigen (weniger „Weiter“-Klicks); Videos und Mobil einzeln
+  private takeGroup(queue: Photo[]): Photo[] {
+    const group = [queue.shift()!];
+    if (!matchMedia('(min-width: 900px)').matches || group[0].video) return group;
+    const t0 = Date.parse(group[0].taken);
+    while (group.length < 6 && queue[0] && !queue[0].video && Date.parse(queue[0].taken) - t0 <= 15 * 60000) group.push(queue.shift()!);
+    return group;
+  }
+
+  private showPhotos(group: Photo[]) {
     const card = this.q<HTMLElement>('.replay-photo');
     return this.showCard(card, () => {
-      const img = card.querySelector('img')!;
-      img.src = p.src;
-      img.onclick = () => this.openPhoto(p);
-      card.querySelector('figcaption')!.textContent = `${p.caption || ''} ${fmtClock(Date.parse(p.taken))}`.trim();
+      const grid = card.querySelector<HTMLElement>('.rp-grid')!;
+      const multi = group.length > 1;
+      grid.dataset.n = String(group.length);
+      grid.replaceChildren(...group.map((p) => {
+        const cell = document.createElement('div');
+        cell.className = 'rp-cell';
+        const img = document.createElement('img');
+        img.src = p.src; img.alt = p.caption || '';
+        img.onclick = () => this.openPhoto(p);
+        cell.append(img);
+        if (multi) { const s = document.createElement('span'); s.textContent = `${p.caption || ''} ${fmtClock(Date.parse(p.taken))}`.trim(); cell.append(s); }
+        return cell;
+      }));
+      const p = group[0];
+      card.querySelector('figcaption')!.textContent = multi ? '' : `${p.caption || ''} ${fmtClock(Date.parse(p.taken))}`.trim();
+      card.classList.toggle('multi', multi);
       card.classList.toggle('is-video', !!p.video);
-      this.tm.addPhotoMarker(p, true);
+      for (const ph of group) this.tm.addPhotoMarker(ph, true);
     });
   }
 
@@ -263,7 +284,7 @@ export class Replay {
 
   private durationFor(seg: Segment): number {
     const km = seg.distanceM / 1000;
-    const base = { camper: 7000 + km * 35, car: 4000 + km * 150, ebike: 7000 + km * 450, bike: 7000 + km * 450, walk: 5000 + km * 900, hike: 6000 + km * 700, ferry: 4000 + km * 1000, bus: 5000 + km * 200, train: 5000 + km * 100 }[seg.kind] ?? 6000;
+    const base = { camper: 7000 + km * 35, car: 4000 + km * 150, ebike: 7000 + km * 450, bike: 7000 + km * 450, walk: 5000 + km * 900, hike: 6000 + km * 700, ferry: 4000 + km * 1000, bus: 5000 + km * 200, train: 5000 + km * 100, boat: 6000 + km * 400 }[seg.kind] ?? 6000;
     return Math.min(base, 22000);
   }
 

@@ -14,7 +14,7 @@ type Dict = {
 
 const de: Dict = {
   locale: 'de-DE',
-  kinds: { camper: 'Camper', car: 'Auto', ebike: 'E-Bike', bike: 'Rad', walk: 'zu Fuß', hike: 'Wanderung', ferry: 'Fähre', bus: 'Bus', train: 'Zug' },
+  kinds: { camper: 'Camper', car: 'Auto', ebike: 'E-Bike', bike: 'Rad', walk: 'zu Fuß', hike: 'Wanderung', ferry: 'Fähre', bus: 'Bus', train: 'Zug', boat: 'Hausboot' },
   stats: { days: 'Tage', ascent: 'Höhenmeter', photos: 'Fotos' },
   scrollHint: 'Scrollen, um die Reise Tag für Tag zu erleben ↓', daysNav: 'Tage', day: 'Tag', play: 'Tag abspielen',
   noEntry: 'Noch kein Tagebucheintrag.', underway: 'Unterwegs', toBeContinued: 'Fortsetzung folgt …',
@@ -27,7 +27,7 @@ const de: Dict = {
 
 const en: Dict = {
   locale: 'en-GB',
-  kinds: { camper: 'Camper', car: 'Car', ebike: 'E-bike', bike: 'Bike', walk: 'On foot', hike: 'Hike', ferry: 'Ferry', bus: 'Bus', train: 'Train' },
+  kinds: { camper: 'Camper', car: 'Car', ebike: 'E-bike', bike: 'Bike', walk: 'On foot', hike: 'Hike', ferry: 'Ferry', bus: 'Bus', train: 'Train', boat: 'Houseboat' },
   stats: { days: 'Days', ascent: 'Elevation gain', photos: 'Photos' },
   scrollHint: 'Scroll to relive the trip day by day ↓', daysNav: 'Days', day: 'Day', play: 'Play this day',
   noEntry: 'No diary entry yet.', underway: 'Along the way', toBeContinued: 'To be continued …',
