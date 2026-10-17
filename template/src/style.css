@@ -188,6 +188,7 @@ body.replaying .vignette { background: linear-gradient(to bottom, rgb(7 9 12 / .
 .end-stats span { font-size: .6rem; text-transform: uppercase; letter-spacing: .12em; color: var(--muted); }
 .end-stats strong { font-family: 'Fraunces', serif; font-size: 1.5rem; }
 .end-actions { display: flex; flex-direction: column; gap: .5rem; }
+.end-actions [hidden] { display: none; }
 
 /* Info-Karte im Replay */
 .replay-info { position: absolute; left: 50%; top: 50%; transform: translate(-50%, -46%) scale(.92); opacity: 0; width: min(86vw, 460px); margin: 0;

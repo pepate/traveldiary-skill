@@ -34,6 +34,8 @@ export class Replay {
   private el: HTMLElement;
   private q = <T extends Element = HTMLElement>(sel: string) => this.el.querySelector<T>(sel)!;
   onClose: () => void = () => {};
+  // liefert den nächsten Tag mit Strecke (für „Nächster Tag“ am Ende); null = letzter Tag
+  nextDay: (n: number) => { day: DayData; photos: Photo[] } | null = () => null;
 
   constructor(private tm: TripMap, root: HTMLElement, private openPhoto: (p: Photo) => void) {
     this.el = root;
@@ -47,11 +49,13 @@ export class Replay {
       if (act === 'next') this.skip = true;
       if (act === 'speed') { this.speed = this.speed === 1 ? 2 : this.speed === 2 ? 4 : 1; this.q('[data-act=speed]').textContent = `${this.speed}×`; }
       if (act === 'again') this.play(this.current!, this.currentPhotos);
+      if (act === 'nextday') { const nx = this.nextDay(this.current!.n); if (nx) this.play(nx.day, nx.photos); }
     });
     addEventListener('keydown', (e) => { if (!this.running) return; if (e.key === 'Escape') this.stop(); if (e.key === ' ' || e.key === 'Enter') { e.preventDefault(); if (this.pendingNext) this.pendingNext(); else this.togglePause(); } });
   }
 
   private current: DayData | null = null;
+  get day() { return this.current?.n ?? null; }
   private currentPhotos: Photo[] = [];
 
   pois: Poi[] = [];
@@ -243,6 +247,7 @@ export class Replay {
     const end = this.q('.replay-end');
     end.querySelector('.end-stats')!.innerHTML = `<div><span>${T.replay.distance}</span><strong>${fmtKm(dist)} km</strong></div>${asc ? `<div><span>${T.replay.ascent}</span><strong>${fmtNum(asc)} m</strong></div>` : ''}<div><span>${T.replay.underwayTime}</span><strong>${fmtDur(ms).join(' ')}</strong></div>`;
     end.querySelector('h3')!.textContent = `${T.day} ${day.n} · ${day.title}`;
+    this.q<HTMLElement>('[data-act=nextday]').hidden = !this.nextDay(day.n);
     end.hidden = false;
     this.tm.map.easeTo({ pitch: 45, zoom: this.tm.map.getZoom() - 1.5, bearing: this.tm.map.getBearing() + 30, duration: 4000 });
   }

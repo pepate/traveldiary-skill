@@ -8,7 +8,7 @@ type Dict = {
   scrollHint: string; daysNav: string; day: string; play: string; noEntry: string; underway: string;
   toBeContinued: string; credits: string; photoCredit: string; commons: string;
   prev: string; next: string; close: string; clockSuffix: string; videoOmitted: string;
-  replay: { distance: string; ascent: string; time: string; loading: string; nextCard: string; done: string; again: string; back: string; underwayTime: string; profile: string; pause: string; skip: string; speed: string };
+  replay: { distance: string; ascent: string; time: string; loading: string; nextCard: string; done: string; again: string; nextDay: string; back: string; underwayTime: string; profile: string; pause: string; skip: string; speed: string };
   error: string; mapError: string; min: string; h: string;
 };
 
@@ -21,7 +21,7 @@ const de: Dict = {
   credits: 'Routen aus GPS-Daten und GPX · Karte: Esri World Imagery · Gelände: Mapzen · Ortsnamen: OpenFreeMap',
   photoCredit: 'Foto:', commons: 'Wikimedia Commons',
   prev: 'Vorheriges', next: 'Nächstes', close: 'Schließen', clockSuffix: ' Uhr', videoOmitted: 'Video nur in der Online-Version',
-  replay: { distance: 'Distanz', ascent: 'Höhenmeter', time: 'Zeit', loading: 'Bilder werden geladen …', nextCard: 'Weiter ›', done: 'Geschafft', again: 'Nochmal', back: 'Zurück zum Tagebuch', underwayTime: 'Unterwegs', profile: 'Höhenprofil', pause: 'Pause', skip: 'Nächster Abschnitt', speed: 'Geschwindigkeit' },
+  replay: { distance: 'Distanz', ascent: 'Höhenmeter', time: 'Zeit', loading: 'Bilder werden geladen …', nextCard: 'Weiter ›', done: 'Geschafft', again: 'Nochmal', nextDay: 'Nächster Tag ›', back: 'Zurück zum Tagebuch', underwayTime: 'Unterwegs', profile: 'Höhenprofil', pause: 'Pause', skip: 'Nächster Abschnitt', speed: 'Geschwindigkeit' },
   error: 'Fehler', mapError: 'Karte', min: 'min', h: 'h',
 };
 
@@ -34,7 +34,7 @@ const en: Dict = {
   credits: 'Routes from GPS data and GPX · Map: Esri World Imagery · Terrain: Mapzen · Place names: OpenFreeMap',
   photoCredit: 'Photo:', commons: 'Wikimedia Commons',
   prev: 'Previous', next: 'Next', close: 'Close', clockSuffix: '', videoOmitted: 'Video only in the online version',
-  replay: { distance: 'Distance', ascent: 'Elevation', time: 'Time', loading: 'Loading photos …', nextCard: 'Next ›', done: 'Done', again: 'Play again', back: 'Back to the diary', underwayTime: 'Moving', profile: 'Elevation profile', pause: 'Pause', skip: 'Next segment', speed: 'Speed' },
+  replay: { distance: 'Distance', ascent: 'Elevation', time: 'Time', loading: 'Loading photos …', nextCard: 'Next ›', done: 'Done', again: 'Play again', nextDay: 'Next day ›', back: 'Back to the diary', underwayTime: 'Moving', profile: 'Elevation profile', pause: 'Pause', skip: 'Next segment', speed: 'Speed' },
   error: 'Error', mapError: 'Map', min: 'min', h: 'h',
 };
 

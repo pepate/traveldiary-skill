@@ -144,7 +144,13 @@ async function main() {
     for (const e of entries) if (e.isIntersecting) show(Number((e.target as HTMLElement).closest<HTMLElement>('[data-day]')!.dataset.day));
   }, { rootMargin: '-35% 0px -35% 0px' });
   document.querySelectorAll('.hero, .card').forEach((s) => io.observe(s));
-  replay.onClose = () => { const n = current; current = -1; show(n); };
+  // nach dem Schließen zum zuletzt abgespielten Tag (kann über „Nächster Tag“ gewechselt haben)
+  replay.onClose = () => { const n = replay.day ?? current; document.getElementById(`tag-${n}`)?.scrollIntoView({ behavior: 'instant' as ScrollBehavior }); current = -1; show(n); };
+  replay.nextDay = (n) => {
+    const d = [...days.values()].filter((x) => x.n > n && x.segments.length).sort((a, b) => a.n - b.n)[0];
+    if (!d) return null;
+    return { day: d, photos: photos.filter((p) => p.day === d.n) };
+  };
   if (location.hash) setTimeout(() => document.querySelector(location.hash)?.scrollIntoView({ behavior: 'instant' as ScrollBehavior }), 400);
 
   const setPadding = () => {
