@@ -1,0 +1,49 @@
+{
+  "skill_name": "traveldiary",
+  "evals": [
+    {
+      "id": 1,
+      "prompt": "Ich will ein neues interaktives Reisetagebuch für meinen Roadtrip durch Norwegen anlegen (Oslo – Bergen – Lofoten, 1.–12. Juni 2026, mit Camper und E-Bike). Die Seite soll auf Englisch sein und am Ende eine einzelne HTML-Datei zum Verschicken werden. Lege das Projekt im Ordner <OUT>/norway an, richte alles so ein, dass ich meine Fotos, GPX-Dateien und Tagebuchtexte bequem einpflegen kann, und sag mir, wie es weitergeht.",
+      "expected_output": "A ready project folder with the template, data/trip.json (lang en, dates, vehicles, output single), a working local setup app the user can open, and clear next steps. No hand-written one-off website.",
+      "files": [],
+      "assertions": [
+        "trip.json: lang is 'en', start 2026-06-01, end 2026-06-12, output 'single'",
+        "Template used: scripts/build-timeline.mjs and src/main.ts exist in the project",
+        "Setup app present: setup/server.mjs exists and package.json has a 'setup' script",
+        "Dependencies installed: node_modules/vite exists",
+        "ANSWER.md tells the user where to put photos/GPX/diary (mentions raw/ folders or the setup app) and the next command"
+      ]
+    },
+    {
+      "id": 2,
+      "prompt": "Mein Reisetagebuch-Projekt liegt unter <PROJECT>. Es gibt neue Daten: Fotos in raw/photos, zwei Komoot-GPX in raw/gpx, die Google-Zeitachse in raw/timeline und zwei neue Tagebucheinträge in content/tagebuch.md (Tag 1 und 2). Bitte beide Tage komplett einbauen: Routen mit sinnvollen Beschriftungen, Fotos mit kurzen Bildunterschriften, ein paar Info-Punkte zu interessanten Stellen, und prüf, dass die Seite läuft.",
+      "expected_output": "trip.json has both days with tracks referencing renamed GPX files and timeline labels; public/data/days/day-1.json and day-2.json exist with segments; all photos have captions in data/captions.json; data/pois.json has 2+ entries with images; build runs without error.",
+      "files": [
+        "evals/sample"
+      ],
+      "assertions": [
+        "trip.json has exactly 2 days; each has a tracks[] entry whose file exists as raw/gpx/<file>.gpx named YYYY-MM-DD_slug",
+        "public/data/days/day-1.json and day-2.json exist and each has at least 2 segments",
+        "trip.json timeline.labels has at least 4 human-readable labels",
+        "Every photo in public/data/photos.json has a non-empty caption",
+        "data/pois.json has at least 2 entries and public/pois contains an image for each",
+        "Build succeeds: dist/index.html exists after the run (or ANSWER.md states the build passed)"
+      ]
+    },
+    {
+      "id": 3,
+      "prompt": "Projekt unter <PROJECT>. Ich habe keine Google-Zeitachse. Für den 10. Oktober 2026 habe ich nur das GPX der Ledrosee-Runde (raw/gpx) und ein paar Fotos (raw/photos). Mit dem Camper bin ich morgens vom Campingplatz am Lago d'Iseo (45.656, 10.037) zum Campingplatz am Lago di Ledro (45.883, 10.731) gefahren, etwa 9:40 bis 11:45 Uhr. Bau den Tag so ein, dass die Camperfahrt und die Radrunde auf der Karte sind, und schreib die Bildunterschriften.",
+      "expected_output": "Day entry uses places + legs for the camper drive (routed, not a straight line), the GPX as track; day JSON contains a camper segment and an ebike segment; captions written; no timeline required.",
+      "files": [
+        "evals/sample"
+      ],
+      "assertions": [
+        "trip.json day has legs[] with from/to ids that both exist in places",
+        "public/data/days/day-1.json contains a camper segment longer than 50 km whose source is not 'straight'",
+        "public/data/days/day-1.json contains an ebike segment from the GPX (source 'gpx')",
+        "Every photo in public/data/photos.json has a non-empty caption",
+        "No Google Timeline file was required or fabricated (raw/timeline contains no Zeitachse.json)"
+      ]
+    }
+  ]
+}
