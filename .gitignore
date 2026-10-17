@@ -2,3 +2,4 @@ node_modules
 *-workspace/
 .cache/
 evals/sample/raw/timeline/
+*.skill
